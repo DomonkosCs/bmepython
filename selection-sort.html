@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Selection Sort Animation</title>
+    <style>
+      table.tomb {
+        border-collapse: collapse;
+        border: 1px solid #c2d9ec;
+      }
+
+      table.tomb tr {
+        border: none;
+      }
+
+      table.tomb tbody td {
+        text-align: center;
+        min-width: 2.5ex;
+        padding: 0.5ex;
+      }
+
+      table.tomb th,
+      table.tomb td {
+        border: 1px solid #c2d9ec;
+      }
+
+      div.tomb {
+        position: relative;
+        font-size: 1.5em;
+        margin: 0.5em auto;
+        z-index: 1;
+        height: 2em;
+        line-height: 2em;
+      }
+
+      div.tomb > span,
+      div.tomb > div {
+        text-align: center;
+        display: block;
+        margin: 0;
+        padding: 0;
+        width: 2em;
+        height: 2em;
+        border-radius: 50%;
+        background-color: #e9f1f8;
+        color: #181818;
+        border: 1px solid #c2d9ec;
+        border-color: rgba(24, 24, 24, 0.15);
+        box-shadow: none;
+        font-weight: bold;
+        transition: background-color 1s, left 0.5s, top 0.25s;
+      }
+
+      div.tomb > span {
+        display: inline-block;
+        margin-right: 0.15em;
+      }
+
+      div.tomb > div {
+        position: absolute;
+      }
+
+      div.tombcaption {
+        margin-top: 0.5em;
+        text-align: center;
+      }
+
+      .tomb .jelolt {
+        outline: 6px solid #ffa500;
+      }
+
+      .tomb .kesz,
+      .tomb .zold {
+        background-color: #6f6;
+      }
+
+      .tomb .pivot,
+      .tomb .sarga {
+        background-color: #ff6;
+      }
+
+      .tomb .piros {
+        background-color: #f44;
+      }
+
+      .tomb .kek {
+        background-color: #66f;
+      }
+
+      .tomb .lila {
+        background-color: #f5f;
+      }
+
+      .tomb .narancs {
+        background-color: #fa0;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Selection Sort Animation</h2>
+    <div
+      id="min"
+      class="tomb"
+      style="width: 22em"
+    ></div>
+
+    <p class="kozep">
+      <button id="start">Start</button>
+      <button id="kovetkezo">Következő</button>
+      <button id="folyamatos">Folyamatos</button>
+    </p>
+
+    <script>
+      function rendezmin(idprefix) {
+        var div = document.getElementById(idprefix);
+
+        var tomb = [];
+        var tav = 2.5; // Width of each bubble
+        var elemszam = 9; // Number of bubbles
+        var anim = 500; // Animation duration
+        var eleje, minindex;
+
+        function csereij(x, y) {
+          var objx = tomb[x],
+            objy = tomb[y];
+          var xleft = objx.style.left,
+            yleft = objy.style.left;
+          objx.style.left = yleft;
+          objy.style.left = xleft;
+
+          setTimeout(function () {
+            tomb[x] = objy;
+            tomb[y] = objx;
+          }, 250);
+        }
+
+        function shuffle(o) {
+          for (
+            var j, x, i = o.length;
+            i;
+            j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x
+          );
+          return o;
+        }
+
+        function start() {
+          div.innerHTML = '';
+          var rendezetlen = [];
+          for (var x = 0; x < elemszam; x++) rendezetlen[x] = x + 1;
+
+          shuffle(rendezetlen);
+          tomb = [];
+
+          for (var j = 0; j < elemszam; j++) {
+            var ujszam = document.createElement('div');
+            ujszam.innerHTML = rendezetlen[j];
+            ujszam.style.left = j * tav + 'em';
+            div.appendChild(ujszam);
+            tomb[j] = ujszam;
+          }
+          eleje = 0;
+          minindex = -1;
+        }
+
+        function minimumkeres() {
+          minindex = eleje;
+          tomb[minindex].className = 'piros';
+          for (var j = minindex + 1; j < tomb.length; j++) {
+            if (+tomb[j].innerHTML < +tomb[minindex].innerHTML) {
+              minindex = j;
+            }
+          }
+          tomb[minindex].className = 'kek';
+        }
+
+        function cserel() {
+          if (minindex != eleje) {
+            csereij(minindex, eleje);
+            tomb[minindex].className = 'kesz';
+            tomb[eleje].className = '';
+          } else {
+            tomb[minindex].className = 'kesz';
+          }
+          minindex = -1;
+          eleje++;
+        }
+
+        function kovetkezo() {
+          if (eleje == tomb.length - 1) {
+            tomb[tomb.length - 1].className = 'kesz';
+            return true;
+          } else {
+            if (minindex == -1) {
+              minimumkeres();
+            } else cserel();
+            return false;
+          }
+        }
+
+        function folyamatos() {
+          var kesz = kovetkezo();
+          if (minindex != -1) kesz = kovetkezo();
+          if (!kesz) setTimeout(folyamatos, anim);
+        }
+        // Connecting the buttons to their respective functions
+        document.getElementById('start').addEventListener('click', start);
+        document
+          .getElementById('kovetkezo')
+          .addEventListener('click', kovetkezo);
+        document
+          .getElementById('folyamatos')
+          .addEventListener('click', folyamatos);
+
+        start(); // Start the initial animation
+      }
+
+      rendezmin('min');
+    </script>
+  </body>
+</html>
